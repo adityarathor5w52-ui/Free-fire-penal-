@@ -238,41 +238,66 @@
       </div>
     </div>
 
-    <!-- 4. MANAGE PAGE -->
+   <!-- 4. MANAGE PAGE -->
     <div id="manage-page" class="page">
       <h3 style="margin-bottom: 15px;">MANAGE</h3>
       
-      <div class="feature-card">
-        <div style="font-size: 11px; color: var(--text-muted);">THIS DEVICE</div>
-        <h4 style="margin: 5px 0 10px 0;">CONNECTED DEVICE</h4>
-        <div style="font-size: 10px; color: var(--text-muted);">LOCKED TO THIS KEY</div>
+      <!-- Telegram Channel Box -->
+      <div class="feature-card" onclick="window.open('https://t.me/adityachoudhary5', '_blank')" style="cursor: pointer; background: #1a2332;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 11px; color: var(--text-muted);">CONNECT WITH US</div>
+            <h4 style="margin: 5px 0 0 0;">TELEGRAM</h4>
+          </div>
+          <span style="font-size: 20px;">➔</span>
+        </div>
       </div>
 
-      <div class="feature-card">
-        <h4>UPDATE NOTES</h4>
-        <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">V1.7 Aim Lag & Gloo Wall angle improvements added.</p>
+      <!-- Logout Button -->
+      <div class="feature-card" onclick="logout()" style="cursor: pointer; background: #2a1515; border-color: #ff3b30;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 11px; color: #ff9f9a;">SESSION</div>
+            <h4 style="margin: 5px 0 0 0; color: #ff3b30;">LOGOUT</h4>
+          </div>
+          <span style="font-size: 20px; color: #ff3b30;">⎋</span>
+        </div>
       </div>
     </div>
-
-  </div><!-- Bottom Navigation -->
-  <div class="nav-bar" id="bottom-nav" style="display: none;">
-    <div class="nav-item active" onclick="switchTab('home-page', this)">HOME</div>
-    <div class="nav-item" onclick="switchTab('features-page', this)">FEATURES</div>
-    <div class="nav-item" onclick="switchTab('manage-page', this)">MANAGE</div>
-  </div>
-</div>
 
 <script>
   function login() {
     const key = document.getElementById('access-key').value;
-    if (key.trim() !== "") {
-      document.getElementById('user-key').innerText = key;
-      document.getElementById('login-page').classList.remove('active');
-      document.getElementById('home-page').classList.add('active');
-      document.getElementById('bottom-nav').style.display = 'flex';
-    } else {
-      alert("Please enter a valid key!");
+    if (key.trim() === "") {
+      alert("Please enter a key!");
+      return;
     }
+
+    fetch('/api/verify-key', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: key })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('user-key').innerText = key;
+        document.getElementById('login-page').classList.remove('active');
+        document.getElementById('home-page').classList.add('active');
+        document.getElementById('bottom-nav').style.display = 'flex';
+      } else {
+        alert(data.message || "Invalid or expired key!");
+      }
+    });
+  }
+
+  function logout() {
+    document.getElementById('access-key').value = '';
+    document.getElementById('home-page').classList.remove('active');
+    document.getElementById('features-page').classList.remove('active');
+    document.getElementById('manage-page').classList.remove('active');
+    document.getElementById('login-page').classList.add('active');
+    document.getElementById('bottom-nav').style.display = 'none';
   }
 
   function switchTab(pageId, element) {
@@ -282,6 +307,7 @@
     document.getElementById(pageId).classList.add('active');
     element.classList.add('active');
   }
+</script>
 </script>
 
 </body>
