@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drake Panel - Features</title>
+  <style>
+    :root {
+      --bg-color: #0b0c10;
+      --card-bg: #14161d;
+      --text-muted: #8e94a0;
+      --border-color: #242834;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background-color: var(--bg-color); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .app-container { width: 100%; max-width: 420px; height: 100vh; max-height: 850px; background: var(--bg-color); border: 1px solid var(--border-color); display: flex; flex-direction: column; position: relative; overflow: hidden; }
+    .header { padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); font-size: 14px; font-weight: 700; }
+    .content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 80px; }
+    
+    .feature-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; margin-bottom: 15px; }
+    .feature-header { display: flex; justify-content: space-between; align-items: center; }
+    .feature-title { font-size: 14px; font-weight: 800; }
+    .feature-desc { font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.4; }
+    
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; transition: .4s; border-radius: 24px; border: 1px solid var(--border-color); }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #fff; }
+    input:checked + .slider:before { transform: translateX(20px); background-color: #000; }
+
+    .sub-section-title { font-size: 10px; color: var(--text-muted); font-weight: 700; margin: 15px 0 8px 0; letter-spacing: 1px; }
+    
+    .grid-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+    .opt-btn { background: #0b0c10; border: 1px solid var(--border-color); color: var(--text-muted); padding: 10px 4px; font-size: 10px; font-weight: 700; text-align: center; border-radius: 6px; cursor: pointer; }
+    .opt-btn.active { background: #fff; color: #000; border-color: #fff; }
+
+    .aim-section { display: flex; gap: 15px; margin-top: 15px; align-items: center; }
+    .body-silhouette { width: 110px; height: 160px; background: #0b0c10; border: 1px solid var(--border-color); border-radius: 8px; position: relative; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 10px; overflow: hidden; }
+    .silhouette-img { width: 65px; opacity: 0.8; }
+    .target-head { position: absolute; top: 15px; width: 32px; height: 35px; border: 1px dashed #ff3b30; background: rgba(255, 59, 48, 0.2); border-radius: 50% 50% 40% 40%; display: flex; justify-content: center; align-items: center; }
+    
+    .height-slider-col { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .height-labels { display: flex; flex-direction: column; gap: 8px; font-size: 10px; color: var(--text-muted); }
+    .height-labels div { display: flex; justify-content: space-between; padding-bottom: 4px; border-bottom: 1px solid #1f232d; }
+    .height-labels div.active-level { color: #fff; font-weight: bold; border-color: #ff3b30; }
+
+    .range-slider { width: 100%; accent-color: #fff; background: #333; height: 4px; border-radius: 2px; outline: none; margin-top: 12px; }
+
+    .nav-bar { position: absolute; bottom: 0; width: 100%; height: 65px; background: var(--bg-color); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; }
+    .nav-item { color: var(--text-muted); font-size: 10px; text-align: center; font-weight: 700; text-decoration: none; cursor: pointer; }
+    .nav-item.active { color: #fff; }
+  </style>
+</head><body>
+<div class="app-container">
+  <div class="header">
+    <span>FEATURES</span>
+    <span>EN</span>
+  </div>
+
+  <div class="content">
+    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">changes apply from your next match <span style="float: right; color: #fff; font-weight: bold;">5/5</span></div>
+
+    <!-- 01 MARKER -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <span class="feature-title">01 MARKER</span>
+        <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+      </div>
+      <div class="feature-desc">marks every enemy on your screen.</div>
+      
+      <div class="sub-section-title">MARK STYLE</div>
+      <div class="grid-btns">
+        <div class="opt-btn active" onclick="setOpt(this)">PHANTOM</div>
+        <div class="opt-btn" onclick="setOpt(this)">DREAM</div>
+        <div class="opt-btn" onclick="setOpt(this)">ICE WALL</div>
+        <div class="opt-btn" onclick="setOpt(this)">MOCO</div>
+        <div class="opt-btn" onclick="setOpt(this)">CLU</div>
+        <div class="opt-btn" onclick="setOpt(this)">SHIROU</div>
+        <div class="opt-btn" onclick="setOpt(this)">IRIS</div>
+        <div class="opt-btn" onclick="setOpt(this)">DREKI</div>
+      </div>
+    </div>
+
+    <!-- 02 AIMPOINT -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <div>
+          <span class="feature-title">02 AIMPOINT</span>
+          <span style="font-size: 9px; background: #222; padding: 2px 5px; border-radius: 4px; margin-left: 5px; color: #aaa;">NEW</span>
+        </div>
+        <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+      </div>
+      <div class="feature-desc">moves your aim from the chest toward the head. slide to choose how far.</div>
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+        <span class="sub-section-title" style="margin:0;">AIM HEIGHT</span>
+        <span id="percentage-text" style="font-size: 18px; font-weight: 900; color: #ff3b30;">100%</span>
+      </div>
+
+      <div class="aim-section">
+        <div class="body-silhouette">
+          <div class="target-head">🎯</div>
+          <svg class="silhouette-img" viewBox="0 0 24 24" fill="#666"><path d="M12 2a4 4 0 0 0-4 4c0 1.88 1.29 3.45 3 3.87V11c-3.31 0-6 2.69-6 6v1h2v-1c0-2.21 1.79-4 4-4s4 1.79 4 4v1h2v-1c0-3.31-2.69-6-6-6v-1.13c1.71-.42 3-1.99 3-3.87a4 4 0 0 0-4-4z"/></svg>
+        </div>
+        <div class="height-slider-col">
+          <div class="height-labels">
+            <div class="active-level"><span>HEAD</span> <span>100%</span></div>
+            <div><span>NECK</span> <span>68%</span></div>
+            <div><span>SHOULDERS</span> <span>50%</span></div>
+            <div><span>UPPER CHEST</span> <span>30%</span></div>
+            <div><span>CHEST</span> <span>0%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 15px;">
+        <input type="range" min="0" max="100" value="100" class="range-slider" oninput="updateHeight(this.value)">
+      </div>
+    </div>
+
+    <!-- 03 AIM LAG -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <span class="feature-title">03 AIM LAG</span>
+        <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+      </div>
+      <div class="feature-desc">freezes the enemy for a moment while you fire or scope, so they're easier to hit.</div>
+      
+      <div style="margin-top: 12px; display: flex; gap: 10px;">
+        <div style="background: #0b0c10; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; font-size: 11px; flex: 1; display: flex; justify-content: space-between; align-items: center;">
+          <span>when firing</span>
+          <label class="switch" style="transform: scale(0.7);"><input type="checkbox"><span class="slider"></span></label>
+        </div>
+        <div style="background: #0b0c10; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; font-size: 11px; flex: 1; display: flex; justify-content: space-between; align-items: center;">
+          <span>when scoping</span>
+          <label class="switch" style="transform: scale(0.7);"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 GLOO WALL ROTATION -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <span class="feature-title">04 GLOO WALL ROTATION</span>
+        <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+      </div>
+      <div class="feature-desc">turns your gloo wall to the angle you set.</div>
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+        <span class="sub-section-title" style="margin:0;">WALL ANGLE</span>
+        <span style="font-size: 18px; font-weight: 900;">180°</span>
+      </div>
+      <div style="margin-bottom: 12px; margin-top: 10px;">
+        <input type="range" min="-90" max="180" value="180" class="range-slider">
+      </div>
+      <div class="grid-btns" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="opt-btn" onclick="setOpt(this)">-90°</div>
+        <div class="opt-btn" onclick="setOpt(this)">0°</div>
+        <div class="opt-btn" onclick="setOpt(this)">+90°</div>
+        <div class="opt-btn active" onclick="setOpt(this)">180°</div>
+      </div>
+    </div>
+
+    <!-- 05 FAST REVIVE -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <span class="feature-title">05 FAST REVIVE</span>
+        <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+      </div>
+      <div class="feature-desc">picks up a knocked teammate in about 0.1 s instead of 3 s.</div>
+    </div>
+
+  </div>
