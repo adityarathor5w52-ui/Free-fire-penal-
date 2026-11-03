@@ -51,19 +51,19 @@
   <div class="content">
     <div class="status-bar">
       <span>■ OFFLINE</span>
-      <span>LAST REFRESHED 45 MIN AGO</span>
+      <span>LAST REFRESHED JUST NOW</span>
     </div>
 
     <!-- TIMER SECTION -->
     <div class="timer-section">
       <div class="skull-icon">💀</div>
-      <div class="timer-val">02H 11M</div>
+      <div class="timer-val" id="time-left">24H 00M</div>
       <div class="timer-label">TIME LEFT</div>
     </div>
 
     <!-- KEY BOX -->
     <div class="key-box">
-      <span>KEY: <strong id="current-key">DRKE-E9E0-1A89-A3E7</strong></span>
+      <span>KEY: <strong id="current-key">DRKE-LOADING</strong></span>
       <button class="copy-btn" onclick="copyKey()">COPY</button>
     </div>
 
@@ -71,11 +71,11 @@
     <div class="info-grid">
       <div class="info-card">
         <label>ACTIVATED</label>
-        <span>03 Nov 2026</span>
+        <span id="activated-date">--</span>
       </div>
       <div class="info-card">
         <label>EXPIRES</label>
-        <span>04 Nov 2026</span>
+        <span id="expires-date">--</span>
       </div>
       <div class="info-card">
         <label>DEVICE</label>
@@ -103,6 +103,32 @@
 </div>
 
 <script>
+  // Page load hone par localStorage se active key uthana
+  window.onload = function() {
+    const savedKey = localStorage.getItem('drake_active_key');
+    if (savedKey) {
+      document.getElementById('current-key').innerText = savedKey;
+      fetchSessionDetails(savedKey);
+    } else {
+      document.getElementById('current-key').innerText = "DRKE-NO-KEY";
+    }
+  };
+
+  function fetchSessionDetails(key) {
+    fetch('/api/session-info', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: key })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('activated-date').innerText = new Date(data.activated_at).toLocaleDateString();
+        document.getElementById('expires-date').innerText = new Date(data.expires_at).toLocaleDateString();
+      }
+    });
+  }
+
   function copyKey() {
     const keyText = document.getElementById('current-key').innerText;
     navigator.clipboard.writeText(keyText);
@@ -111,8 +137,12 @@
 
   function openHappApp() {
     const key = document.getElementById('current-key').innerText;
-    // Happ proxy app ko key ke sath trigger karne ke liye deep link
-    window.location.href = `happ://add?key=${key}`;
+    if(!key || key === "DRKE-NO-KEY") {
+      alert("No valid active key found!");
+      return;
+    }
+    // Happ proxy app deep-link trigger
+    window.location.href = `happ://add?key=${key}&server=drake-panel`;
   }
 </script>
 </body>

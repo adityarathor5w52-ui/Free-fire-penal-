@@ -74,6 +74,30 @@ app.post('/api/verify-key', (req, res) => {
 
     res.json({ success: true, data: row });
   });
+});// Server.js ke andar yeh route add karein
+app.post('/api/session-info', (req, res) => {
+  const { key } = req.body;
+  
+  db.get(`SELECT * FROM keys WHERE key_string = ?`, [key], (err, row) => {
+    if (err || !row) {
+      return res.json({ success: false, message: "Invalid session key!" });
+    }
+
+    // Check expiry
+    const now = new Date();
+    const expiryTime = new Date(row.expires_at);
+    if (now > expiryTime) {
+      return res.json({ success: false, message: "Key has expired!" });
+    }
+
+    // Agar key sahi hai toh data bhej do
+    res.json({ 
+      success: true, 
+      key: row.key_string,
+      activated_at: row.created_at,
+      expires_at: row.expires_at 
+    });
+  });
 });
 
 app.listen(PORT, () => {
