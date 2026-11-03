@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drake Admin - Key Generator</title>
+  <style>
+    :root {
+      --bg-color: #0b0c10;
+      --card-bg: #14161d;
+      --text-muted: #8e94a0;
+      --border-color: #242834;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background-color: var(--bg-color); color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .admin-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; }
+    .btn { background: #ff3b30; color: #fff; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 20px; }
+    input { width: 100%; padding: 12px; background: var(--bg-color); border: 1px solid var(--border-color); color: #fff; border-radius: 8px; margin-top: 15px; font-family: monospace; text-align: center; }
+  </style>
+</head>
+<body>
+
+<div class="admin-box">
+  <h2>DRAKE ADMIN</h2>
+  <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">SECURE KEY GENERATOR</p>
+  
+  <button class="btn" onclick="generateKey()">GENERATE NEW KEY</button>
+  <input type="text" id="result-key" readonly placeholder="DRKE-XXXX-XXXX-XXXX">
+</div>
+
+<script>
+  function generateKey() {
+    fetch('/api/generate-key', { method: 'POST' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('result-key').value = data.key;
+        } else {
+          alert("Error generating key!");
+        }
+      });
+  }
+</script>
+
+</body>
+</html>
