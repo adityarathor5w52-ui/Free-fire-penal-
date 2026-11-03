@@ -285,4 +285,23 @@
 </script>
 
 </body>
-</html>
+</html><!-- Admin Key Generator Button -->
+<div style="margin-top: 20px; text-align: center;">
+  <button class="btn" onclick="generateKey()" style="background: #ff3b30; color: #fff;">GENERATE NEW KEY</button>
+  <p id="generated-key-display" style="margin-top: 10px; font-family: monospace; font-size: 12px;"></p>
+</div>
+
+<script>
+  function generateKey() {
+    fetch('/api/generate-key', { method: 'POST' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('generated-key-display').innerText = "Generated: " + data.key + " (Expires: " + data.expires_at + ")";
+          alert("Key Generated Successfully: " + data.key);
+        } else {
+          alert("Error generating key");
+        }
+      });
+  }
+</script>
