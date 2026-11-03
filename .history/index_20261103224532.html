@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRAKE PANEL</title>
+  <style>
+    :root {
+      --bg-color: #0b0c10;
+      --card-bg: #14161d;
+      --accent-color: #ffffff;
+      --text-muted: #8e94a0;
+      --border-color: #242834;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }.app-container {
+      width: 100%;
+      max-width: 420px;
+      height: 100vh;
+      max-height: 850px;
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      padding-bottom: 80px;
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .login-box { text-align: center; margin-top: 40px; }
+    .logo-icon { font-size: 80px; margin-bottom: 10px; }
+    .brand-title { font-size: 28px; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px; }
+    .sub-text { color: var(--text-muted); font-size: 11px; letter-spacing: 1px; margin-bottom: 40px; }
+
+    .input-group {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      display: flex;
+      padding: 6px;
+      margin-bottom: 15px;
+    }
+
+    .input-group input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      padding: 10px;
+      flex: 1;
+      font-family: monospace;
+    }
+
+    .btn {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 14px;
+      width: 100%;
+      border-radius: 8px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
+  </style>
+</head>

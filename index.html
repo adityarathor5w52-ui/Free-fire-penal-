@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DRAKE PANEL</title><style>
+  <title>DRAKE PANEL</title>
+  <style>
     :root {
       --bg-color: #0b0c10;
       --card-bg: #14161d;
@@ -26,9 +27,7 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-    }
-
-    .app-container {
+    }.app-container {
       width: 100%;
       max-width: 420px;
       height: 100vh;
@@ -97,7 +96,8 @@
       letter-spacing: 1px;
       cursor: pointer;
     }
-
+  </style>
+</head><style>
     .status-badge { display: inline-block; padding: 4px 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; font-size: 10px; color: var(--text-muted); margin-bottom: 20px; }
     .timer-circle { text-align: center; margin: 30px 0; }
     .timer-val { font-size: 36px; font-weight: 900; letter-spacing: 2px; }
@@ -175,7 +175,7 @@
 
       <div class="key-info-box">
         <span>KEY: <strong id="user-key">DRKE-E9E0-1A89-A3E7</strong></span>
-        <span style="cursor:pointer;" onclick="navigator.clipboard.writeText('DRKE-E9E0-1A89-A3E7')">COPY</span>
+        <span style="cursor:pointer;" onclick="navigator.clipboard.writeText(document.getElementById('user-key').innerText)">COPY</span>
       </div>
 
       <div class="info-grid">
@@ -238,11 +238,11 @@
       </div>
     </div>
 
-   <!-- 4. MANAGE PAGE -->
+    <!-- 4. MANAGE PAGE -->
     <div id="manage-page" class="page">
       <h3 style="margin-bottom: 15px;">MANAGE</h3>
       
-      <!-- Telegram Channel Box -->
+      <!-- Telegram Direct Link Box -->
       <div class="feature-card" onclick="window.open('https://t.me/adityachoudhary5', '_blank')" style="cursor: pointer; background: #1a2332;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div>
@@ -264,6 +264,14 @@
         </div>
       </div>
     </div>
+
+  </div><!-- Bottom Navigation -->
+  <div class="nav-bar" id="bottom-nav" style="display: none;">
+    <div class="nav-item active" onclick="switchTab('home-page', this)">HOME</div>
+    <div class="nav-item" onclick="switchTab('features-page', this)">FEATURES</div>
+    <div class="nav-item" onclick="switchTab('manage-page', this)">MANAGE</div>
+  </div>
+</div>
 
 <script>
   function login() {
@@ -308,26 +316,6 @@
     element.classList.add('active');
   }
 </script>
-</script>
 
 </body>
-</html><!-- Admin Key Generator Button -->
-<div style="margin-top: 20px; text-align: center;">
-  <button class="btn" onclick="generateKey()" style="background: #ff3b30; color: #fff;">GENERATE NEW KEY</button>
-  <p id="generated-key-display" style="margin-top: 10px; font-family: monospace; font-size: 12px;"></p>
-</div>
-
-<script>
-  function generateKey() {
-    fetch('/api/generate-key', { method: 'POST' })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          document.getElementById('generated-key-display').innerText = "Generated: " + data.key + " (Expires: " + data.expires_at + ")";
-          alert("Key Generated Successfully: " + data.key);
-        } else {
-          alert("Error generating key");
-        }
-      });
-  }
-</script>
+</html>
