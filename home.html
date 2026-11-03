@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drake Panel - Home</title>
+  <style>
+    :root {
+      --bg-color: #0b0c10;
+      --card-bg: #14161d;
+      --text-muted: #8e94a0;
+      --border-color: #242834;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background-color: var(--bg-color); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .app-container { width: 100%; max-width: 420px; height: 100vh; max-height: 850px; background: var(--bg-color); border: 1px solid var(--border-color); display: flex; flex-direction: column; position: relative; overflow: hidden; }
+    .header { padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+    .content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 80px; }
+
+    .status-bar { display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted); margin-bottom: 20px; }
+    
+    .timer-section { text-align: center; margin: 20px 0 30px 0; position: relative; }
+    .skull-icon { font-size: 45px; margin-bottom: 5px; }
+    .timer-val { font-size: 34px; font-weight: 900; letter-spacing: 2px; }
+    .timer-label { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; margin-top: 2px; }
+
+    .key-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-family: monospace; font-size: 12px; }
+    .copy-btn { background: #222; border: 1px solid var(--border-color); color: #fff; padding: 6px 12px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+    .info-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 10px 6px; border-radius: 6px; text-align: center; }
+    .info-card label { display: block; font-size: 8px; color: var(--text-muted); margin-bottom: 4px; letter-spacing: 0.5px; }
+    .info-card span { font-size: 10px; font-weight: bold; }
+
+    .sub-btn { background: #fff; color: #000; padding: 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-top: 10px; }
+    .sub-btn-title { font-size: 13px; font-weight: 900; letter-spacing: 0.5px; }
+    .sub-btn-sub { font-size: 9px; color: #444; margin-top: 2px; }
+    .plus-icon { background: #000; color: #fff; width: 28px; height: 28px; border-radius: 6px; display: flex; justify-content: center; align-items: center; font-size: 16px; font-weight: bold; }
+
+    .nav-bar { position: absolute; bottom: 0; width: 100%; height: 65px; background: var(--bg-color); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; }
+    .nav-item { color: var(--text-muted); font-size: 10px; text-align: center; font-weight: 700; text-decoration: none; cursor: pointer; }
+    .nav-item.active { color: #fff; }
+  </style>
+</head><body>
+<div class="app-container">
+  <div class="header">
+    <span>DRAKE BY ADITYA</span>
+    <span>EN</span>
+  </div>
+
+  <div class="content">
+    <div class="status-bar">
+      <span>■ OFFLINE</span>
+      <span>LAST REFRESHED 45 MIN AGO</span>
+    </div>
+
+    <!-- TIMER SECTION -->
+    <div class="timer-section">
+      <div class="skull-icon">💀</div>
+      <div class="timer-val">02H 11M</div>
+      <div class="timer-label">TIME LEFT</div>
+    </div>
+
+    <!-- KEY BOX -->
+    <div class="key-box">
+      <span>KEY: <strong id="current-key">DRKE-E9E0-1A89-A3E7</strong></span>
+      <button class="copy-btn" onclick="copyKey()">COPY</button>
+    </div>
+
+    <!-- INFO CARDS -->
+    <div class="info-grid">
+      <div class="info-card">
+        <label>ACTIVATED</label>
+        <span>03 Nov 2026</span>
+      </div>
+      <div class="info-card">
+        <label>EXPIRES</label>
+        <span>04 Nov 2026</span>
+      </div>
+      <div class="info-card">
+        <label>DEVICE</label>
+        <span>Android · Mobile</span>
+      </div>
+    </div>
+
+    <!-- ADD SUBSCRIPTION (OPENS HAPP PROXY APP) -->
+    <div class="sub-btn" onclick="openHappApp()">
+      <div>
+        <div class="sub-btn-title">ADD SUBSCRIPTION</div>
+        <div class="sub-btn-sub">opens your happ proxy app with your key ready</div>
+      </div>
+      <div class="plus-icon">+</div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <div class="nav-bar">
+    <a href="/home" class="nav-item active">HOME</a>
+    <a href="/features" class="nav-item">FEATURES</a>
+    <a href="/manage" class="nav-item">MANAGE</a>
+  </div>
+</div>
+
+<script>
+  function copyKey() {
+    const keyText = document.getElementById('current-key').innerText;
+    navigator.clipboard.writeText(keyText);
+    alert("Key copied to clipboard!");
+  }
+
+  function openHappApp() {
+    const key = document.getElementById('current-key').innerText;
+    // Happ proxy app ko key ke sath trigger karne ke liye deep link
+    window.location.href = `happ://add?key=${key}`;
+  }
+</script>
+</body>
+</html>
