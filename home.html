@@ -44,11 +44,13 @@
       <div class="info-card"><label>EXPIRES</label><span id="expires-date">--</span></div>
       <div class="info-card"><label>DEVICE</label><span id="device-name">Detecting...</span></div>
     </div>
-    <div class="sub-btn" onclick="openHappApp()">
-      <div><div class="sub-btn-title">ADD SUBSCRIPTION</div><div class="sub-btn-sub">opens your vpn app with your key ready</div></div>
-      <div class="plus-icon">+</div>
-    </div>
+   <div class="sub-btn" onclick="openHappApp()">
+  <div>
+    <div class="sub-btn-title">ADD SUBSCRIPTION</div>
+    <div class="sub-btn-sub">opens your vpn app with your key ready</div>
   </div>
+  <div class="plus-icon">+</div>
+</div>
   <div class="nav-bar">
     <a href="/home" class="nav-item active">HOME</a>
     <a href="/features" class="nav-item">FEATURES</a>
@@ -104,12 +106,15 @@
       document.getElementById('time-left').innerText = hours + 'H ' + minutes + 'M ' + seconds + 'S';
     }, 1000);
   }
-  function copyKey() { navigator.clipboard.writeText(document.getElementById('current-key').innerText); alert("Key copied!"); }
-  function openHappApp() {
-    const key = document.getElementById('current-key').innerText;
-    if(!key || key === "LOADING...") { alert("No active key!"); return; }
-    window.location.href = 'happ://add?key=' + key + '&server=drake-panel';
+ function openHappApp() {
+  const key = document.getElementById('current-key').innerText;
+  if(!key || key === "LOADING...") {
+    alert("No active key!");
+    return;
   }
+  navigator.clipboard.writeText(key);
+  window.location.href = 'happ://add?key=' + key + '&server=drake-panel';
+}
 </script>
 </body>
 </html>
