@@ -93,7 +93,7 @@ app.post('/api/session-info', (req, res) => {
   });
 });
 
-// API: Subscription Link for Happ App (Success response format)
+// API: Subscription Link for Happ App
 app.get('/api/sub/:key', (req, res) => {
   const key = req.params.key;
   
@@ -101,32 +101,12 @@ app.get('/api/sub/:key', (req, res) => {
     if (err || !row) {
       return res.status(404).send("Invalid or expired key!");
     }
-    
     if (new Date() > new Date(row.expires_at)) {
       return res.status(403).send("Key has expired!");
     }
 
-    // Happ app ke liye standard subscription raw format
-    const configData = `hysteria://127.0.0.1:443?peer=drake-panel&insecure=1#DRAKE PANEL [${key}]`;
-    
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    const configData = `hysteria://127.0.0.1:443?peer=drake-panel&insecure=1#PHANTOM BY DRAKE [${key}]`;
     res.send(configData);
- // API: Subscription Link for Happ App
-app.get('/api/sub/:key', (req, res) => {
-  const key = req.params.key;
-  const clientHwid = req.query.hwid || '';
-
- db.get(`SELECT * FROM keys WHERE key_string = ?`, [key], (err, row) => {
-      if (err || !row) {
-        return res.status(404).send("Invalid or expired subscription key!");
-      }
-      if (new Date() > new Date(row.expires_at)) {
-        return res.status(403).send("Subscription key has expired!");
-      }
-
-      const configData = `hysteria://127.0.0.1:443?peer=drake-panel&insecure=1#PHANTOM BY DRAKE [${key}]`;
-      res.send(configData);
-    });
   });
 });
 
