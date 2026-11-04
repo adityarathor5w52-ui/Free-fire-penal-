@@ -177,13 +177,15 @@ app.get('/home', (req, res) => {
         const now = new Date().getTime();
         const distance = expiryTimestamp - now;
         if (distance < 0) {
-          document.getElementById('time-left').innerText = "EXPIRED";
+          alert("Key has expired! Logging out.");
+          localStorage.removeItem('drake_active_key');
+          window.location.href = '/';
           return;
         }
         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        document.getElementById('time-left').innerText = \`\${hours}H \${minutes}M \${seconds}S\`;
+        document.getElementById('time-left').innerText = hours + 'H ' + minutes + 'M ' + seconds + 'S';
       }, 1000);
     }
 
