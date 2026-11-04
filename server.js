@@ -80,5 +80,19 @@ app.post('/api/session-info', (req, res) => {
     res.json({ success: true, key: row.key_string, activated_at: row.created_at, expires_at: row.expires_at });
   });
 });
+// API: Subscription Link for Happ App
+app.get('/api/sub/:key', (req, res) => {
+  const key = req.params.key;
+  db.get(`SELECT * FROM keys WHERE key_string = ?`, [key], (err, row) => {
+    if (err || !row) {
+      return res.status(404).send("Invalid or expired key!");
+    }
+    if (new Date() > new Date(row.expires_at)) {
+      return res.status(403).send("Key has expired!");
+    }
+    const configData = `hysteria://127.0.0.1:443?peer=drake-panel&insecure=1#PHANTOM BY DRAKE [${key}]`;
+    res.send(Buffer.from(configData).toString('base64'));
+  });
+});
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
