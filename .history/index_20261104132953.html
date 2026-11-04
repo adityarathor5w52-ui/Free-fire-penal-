@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drake Panel - Login</title>
+  <style>
+    :root { --bg-color: #0b0c10; --card-bg: #14161d; --text-muted: #8e94a0; --border-color: #242834; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background-color: var(--bg-color); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .login-container { width: 100%; max-width: 380px; background: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 12px; text-align: center; }
+    h2 { font-size: 18px; font-weight: 900; margin-bottom: 8px; letter-spacing: 1px; }
+    p { font-size: 10px; color: var(--text-muted); margin-bottom: 20px; letter-spacing: 1px; }
+    input { width: 100%; padding: 12px; background: var(--bg-color); border: 1px solid var(--border-color); color: #fff; border-radius: 8px; font-size: 12px; margin-bottom: 15px; outline: none; text-align: center; font-family: monospace; }
+    button { background: #fff; color: #000; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 800; cursor: pointer; letter-spacing: 1px; }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>DRAKE PANEL</h2>
+    <p>ENTER YOUR LICENSE KEY TO CONTINUE</p>
+    <input type="text" id="key-input" placeholder="DRKE-XXXX-XXXX-XXXX">
+    <button onclick="verifyKey()">UNLOCK PANEL</button>
+  </div>
+  <script>
+    function verifyKey() {
+      const key = document.getElementById('key-input').value.trim();
+      if(!key) { alert("Please enter a key!"); return; }
+      fetch('/api/verify-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: key })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.success) {
+          localStorage.setItem('drake_active_key', key);
+          window.location.href = '/home';
+        } else {
+          alert(data.message || "Invalid or expired key!");
+        }
+      });
+    }
+  </script>
+</body>
+</html>
