@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// Database Setup
+// Database Setup with HWID support
 const dbPath = path.resolve(__dirname, 'database.db');
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) console.error("Database opening error: ", err.message);
@@ -20,7 +20,9 @@ db.run(`CREATE TABLE IF NOT EXISTS keys (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   key_string TEXT UNIQUE,
   expires_at TEXT,
-  created_at TEXT
+  created_at TEXT,
+  hwid TEXT,
+  last_reset_at TEXT
 )`);
 
 // Page Routes
@@ -48,7 +50,7 @@ app.post('/api/generate-key', (req, res) => {
     const newKey = `DRKE-${randomPart()}-${randomPart()}-${randomPart()}`;
     keysArray.push(newKey);
 
-    db.run(`INSERT INTO keys (key_string, expires_at, created_at) VALUES (?, ?, ?)`, 
+    db.run(`INSERT INTO keys (key_string, expires_at, created_at, hwid, last_reset_at) VALUES (?, ?, ?, NULL, NULL)`, 
       [newKey, expiresAt, createdAt], function(err) {
         completed++;
         if (completed === totalKeys) {
@@ -61,12 +63,22 @@ app.post('/api/generate-key', (req, res) => {
   }
 });
 
-// API: Verify Key
+// API: Verify Key with HWID Binding
 app.post('/api/verify-key', (req, res) => {
-  const { key } = req.body;
+  const { key, hwid } = req.body;
+  
   db.get(`SELECT * FROM keys WHERE key_string = ?`, [key], (err, row) => {
     if (err || !row) return res.json({ success: false, message: "Invalid key!" });
     if (new Date() > new Date(row.expires_at)) return res.json({ success: false, message: "Key has expired!" });
+
+    // HWID Binding Logic
+    if (!row.hwid && hwid) {
+      // First time login on this device, lock HWID
+      db.run(`UPDATE keys SET hwid = ? WHERE key_string = ?`, [hwid, key]);
+    } else if (row.hwid && row.hwid !== hwid) {
+      return res.json({ success: false, message: "This key is locked to another phone. HWID Mismatch!" });
+    }
+
     res.json({ success: true, data: row });
   });
 });
@@ -80,17 +92,25 @@ app.post('/api/session-info', (req, res) => {
     res.json({ success: true, key: row.key_string, activated_at: row.created_at, expires_at: row.expires_at });
   });
 });
-//API: Subscription Link for Happ App
+
+// API: Subscription Link with HWID Check for Happ App
 app.get('/api/sub/:key', (req, res) => {
   const key = req.params.key;
+  const clientHwid = req.query.hwid || '';
+
   db.get(`SELECT * FROM keys WHERE key_string = ?`, [key], (err, row) => {
     if (err || !row) {
-      return res.status(404).send("Invalid or expired key!");
+      return res.status(404).send("Invalid or expired subscription key!");
     }
     if (new Date() > new Date(row.expires_at)) {
-      return res.status(403).send("Key has expired!");
+      return res.status(403).send("Subscription key has expired!");
     }
-    // Seedha raw link bhejni hai bina base64 ke
+
+    // HWID check for subscription request
+    if (row.hwid && clientHwid && row.hwid !== clientHwid) {
+      return res.status(403).send("HWID MISMATCH – This key is locked to another phone. Reset it on the site (once every 7 days).");
+    }
+
     const configData = `hysteria://127.0.0.1:443?peer=drake-panel&insecure=1#PHANTOM BY DRAKE [${key}]`;
     res.send(configData);
   });
