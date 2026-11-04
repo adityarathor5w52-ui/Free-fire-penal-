@@ -116,16 +116,17 @@ app.get('/api/sub/:key', (req, res) => {
   const key = req.params.key;
   const clientHwid = req.query.hwid || '';
 
-  db.get(`SELECT * FROM keys WHERE key_string = ?`, [key], (err, row) => {
-    if (err || !row) {
-      return res.status(404).send("Invalid or expired subscription key!");
-    }
-    if (new Date() > new Date(row.expires_at)) {
-      return res.status(403).send("Subscription key has expired!");
-    }
+ db.get(`SELECT * FROM keys WHERE key_string = ?`, [key], (err, row) => {
+      if (err || !row) {
+        return res.status(404).send("Invalid or expired subscription key!");
+      }
+      if (new Date() > new Date(row.expires_at)) {
+        return res.status(403).send("Subscription key has expired!");
+      }
 
-    const configData = `hysteria://127.0.0.1:443?peer=drake-panel&insecure=1#PHANTOM BY DRAKE [${key}]`;
-    res.send(configData);
+      const configData = `hysteria://127.0.0.1:443?peer=drake-panel&insecure=1#PHANTOM BY DRAKE [${key}]`;
+      res.send(configData);
+    });
   });
 });
 
