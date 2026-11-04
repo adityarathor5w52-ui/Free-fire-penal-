@@ -115,12 +115,12 @@ app.get('/home', (req, res) => {
     <div class="header"><span>HOME</span><div class="header-right"><span>🔔</span><span>EN</span></div></div>
     <div class="content">
       <div class="status-bar"><span>■ OFFLINE</span><span>LAST REFRESHED JUST NOW</span></div>
-      <div class="timer-section"><div class="dial-ring"></div><div class="skull-icon">💀</div><div class="timer-val" id="time-left">2H 36M</div><div class="timer-label">TIME LEFT</div></div>
+      <div class="timer-section"><div class="dial-ring"></div><div class="skull-icon">💀</div><div class="timer-val" id="time-left">LOADING...</div><div class="timer-label">TIME LEFT</div></div>
       <div class="key-box"><span>KEY <strong id="current-key" style="margin-left:5px;">LOADING...</strong></span><button class="copy-btn" onclick="copyKey()">COPY</button></div>
       <div class="info-grid">
         <div class="info-card"><label>ACTIVATED</label><span id="activated-date">--</span></div>
         <div class="info-card"><label>EXPIRES</label><span id="expires-date">--</span></div>
-        <div class="info-card"><label>DEVICE</label><span>Android · Mobile</span></div>
+        <div class="info-card"><label>DEVICE</label><span id="device-name">Detecting...</span></div>
       </div>
       <div class="sub-btn" onclick="openHappApp()">
         <div><div class="sub-btn-title">ADD SUBSCRIPTION</div><div class="sub-btn-sub">opens your vpn app with your key ready</div></div>
@@ -134,19 +134,59 @@ app.get('/home', (req, res) => {
     </div>
   </div>
   <script>
+    let expiryTimestamp = null;
+
     window.onload = function() {
+      detectDevice();
       const savedKey = localStorage.getItem('drake_active_key');
       if (savedKey) { document.getElementById('current-key').innerText = savedKey; fetchSessionDetails(savedKey); }
+      else { window.location.href = '/'; }
     };
+
+    function detectDevice() {
+      const ua = navigator.userAgent;
+      let device = "Mobile Device";
+      if (/android/i.test(ua)) {
+        let match = ua.match(/;\s*([^;]+)\s+Build\//);
+        device = match ? match[1] + " · Android" : "Android Device";
+      } else if (/iphone|ipad|ipod/i.test(ua)) {
+        device = "iOS · iPhone";
+      }
+      document.getElementById('device-name').innerText = device;
+    }
+
     function fetchSessionDetails(key) {
       fetch('/api/session-info', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: key }) })
       .then(res => res.json()).then(data => {
         if (data.success) {
           document.getElementById('activated-date').innerText = new Date(data.activated_at).toLocaleDateString();
           document.getElementById('expires-date').innerText = new Date(data.expires_at).toLocaleDateString();
+          expiryTimestamp = new Date(data.expires_at).getTime();
+          startLiveTimer();
+        } else {
+          alert(data.message);
+          localStorage.removeItem('drake_active_key');
+          window.location.href = '/';
         }
       });
     }
+
+    function startLiveTimer() {
+      setInterval(() => {
+        if (!expiryTimestamp) return;
+        const now = new Date().getTime();
+        const distance = expiryTimestamp - now;
+        if (distance < 0) {
+          document.getElementById('time-left').innerText = "EXPIRED";
+          return;
+        }
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        document.getElementById('time-left').innerText = \`\${hours}H \${minutes}M \${seconds}S\`;
+      }, 1000);
+    }
+
     function copyKey() { navigator.clipboard.writeText(document.getElementById('current-key').innerText); alert("Key copied!"); }
     function openHappApp() {
       const key = document.getElementById('current-key').innerText;
@@ -309,7 +349,8 @@ app.get('/manage', (req, res) => {
       .header { padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); font-size: 14px; font-weight: 700; }
       .content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 80px; }
       .card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 10px; margin-bottom: 15px; }
-      .btn-danger { background: #ff3b30; color: #fff; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 10px; }
+      .btn-danger { background: #ff3b30; color: #fff; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 10px; text-align: center; display: block; text-decoration: none; }
+      .btn-telegram { background: #0088cc; color: #fff; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 10px; text-align: center; display: block; text-decoration: none; }
       .nav-bar { position: absolute; bottom: 0; width: 100%; height: 65px; background: var(--bg-color); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; }
       .nav-item { color: var(--text-muted); font-size: 10px; text-align: center; font-weight: 700; text-decoration: none; cursor: pointer; }
       .nav-item.active { color: #fff; }
@@ -317,12 +358,17 @@ app.get('/manage', (req, res) => {
   </head>
   <body>
   <div class="app-container">
-    <div class="header"><span>MANAGE SESSION</span><span>EN</span></div>
+    <div class="header"><span>MANAGE PANEL</span><span>EN</span></div>
     <div class="content">
       <div class="card">
         <h3 style="font-size: 14px; margin-bottom: 10px;">Session Control</h3>
         <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Logout or switch your active license key from this device.</p>
         <button class="btn-danger" onclick="logoutSession()">LOGOUT / REMOVE KEY</button>
+      </div>
+      <div class="card">
+        <h3 style="font-size: 14px; margin-bottom: 10px;">Community Support</h3>
+        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Join our official channel for updates and keys.</p>
+        <a href="https://t.me/your_telegram_channel" target="_blank" class="btn-telegram">JOIN TELEGRAM CHANNEL</a>
       </div>
     </div>
     <div class="nav-bar">
