@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Drake Admin - Protected</title>
+  <title>Drake Admin - Bulk Generator</title>
   <style>
     :root {
       --bg-color: #0b0c10;
@@ -12,9 +12,9 @@
       --border-color: #242834;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-    body { background-color: var(--bg-color); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-    .admin-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 25px; border-radius: 12px; width: 100%; max-width: 420px; display: none; }
-    .login-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 25px; border-radius: 12px; width: 100%; max-width: 420px; text-align: center; }
+    body { background-color: var(--bg-color); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    .admin-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 25px; border-radius: 12px; width: 100%; max-width: 450px; display: none; }
+    .login-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 25px; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; }
     .title { font-size: 16px; font-weight: 900; letter-spacing: 1px; text-align: center; margin-bottom: 5px; }
     .subtitle { font-size: 10px; color: var(--text-muted); text-align: center; margin-bottom: 20px; letter-spacing: 1px; }
     
@@ -25,12 +25,12 @@
     
     .btn { background: #fff; color: #000; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 5px; letter-spacing: 1px; }
     
-    .result-box { margin-top: 20px; background: var(--bg-color); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; text-align: center; font-family: monospace; font-size: 14px; color: #00ff66; letter-spacing: 1px; }
+    .result-box { margin-top: 20px; background: var(--bg-color); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; color: #00ff66; line-height: 1.6; }
   </style>
 </head>
 <body>
 
-<!-- PASSWORD LOGIN SCREEN -->
+<!-- PASSWORD LOGIN -->
 <div class="login-box" id="login-screen">
   <div class="title">ADMIN ACCESS</div>
   <div class="subtitle">ENTER PASSWORD TO CONTINUE</div>
@@ -41,37 +41,44 @@
   <button class="btn" onclick="checkPassword()">LOGIN</button>
 </div>
 
-<!-- ACTUAL ADMIN PANEL (HIDDEN UNTIL PASSWORD IS CORRECT) -->
+<!-- ADMIN PANEL -->
 <div class="admin-box" id="admin-panel">
-  <div class="title">DRAKE ADMIN PANEL</div>
-  <div class="subtitle">GENERATE TIMED ACCESS KEYS</div>
+  <div class="title">DRAKE BULK ADMIN</div>
+  <div class="subtitle">GENERATE MULTIPLE KEYS AT ONCE</div>
 
   <div class="form-group">
-    <label>SELECT KEY VALIDITY / DURATION</label>
+    <label>SELECT KEY DURATION</label>
     <select id="duration-select">
       <option value="1">1 Hour</option>
-      <option value="2">2 Hours</option>
-      <option value="6">6 Hours</option>
-      <option value="12">12 Hours</option>
       <option value="24" selected>1 Day (24 Hours)</option>
-      <option value="72">3 Days</option>
       <option value="168">7 Days (1 Week)</option>
       <option value="720">30 Days (1 Month)</option>
     </select>
   </div>
 
-  <button class="btn" onclick="generateKey()">GENERATE KEY</button>
+  <div class="form-group">
+    <label>NUMBER OF KEYS TO GENERATE</label>
+    <select id="count-select">
+      <option value="1">1 Key</option>
+      <option value="10">10 Keys</option>
+      <option value="20">20 Keys</option>
+      <option value="30">30 Keys</option>
+      <option value="40">40 Keys</option>
+      <option value="50">50 Keys</option>
+      <option value="60">60 Keys</option>
+    </select>
+  </div>
 
-  <div class="result-box" id="result-key">DRKE-XXXX-XXXX-XXXX</div>
+  <button class="btn" onclick="generateKeys()">GENERATE BULK KEYS</button>
+
+  <div class="result-box" id="result-keys">Generated keys will appear here...</div>
 </div>
 
 <script>
-  // Yahan apna pasandida password set kar sakte hain (jaise: "aditya123")
-  const ADMIN_PASSWORD = "aditya2008"; 
+  const ADMIN_PASSWORD = "admin"; 
 
   function checkPassword() {
-    const enteredPass = document.getElementById('admin-pass').value;
-    if (enteredPass === ADMIN_PASSWORD) {
+    if (document.getElementById('admin-pass').value === ADMIN_PASSWORD) {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('admin-panel').style.display = 'block';
     } else {
@@ -79,20 +86,21 @@
     }
   }
 
-  function generateKey() {
-    const duration = document.getElementById('duration-select').value;
+  function generateKeys() {
+    const duration = parseInt(document.getElementById('duration-select').value);
+    const count = parseInt(document.getElementById('count-select').value);
 
     fetch('/api/generate-key', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ duration: parseInt(duration) })
+      body: JSON.stringify({ duration: duration, count: count })
     })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        document.getElementById('result-key').innerText = data.key;
+        document.getElementById('result-keys').innerHTML = data.keys.join('<br>');
       } else {
-        alert("Error generating key!");
+        alert("Error generating keys!");
       }
     });
   }

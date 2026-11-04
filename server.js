@@ -49,38 +49,45 @@ app.get('/manage', (req, res) => {
   res.sendFile(path.join(__dirname, 'manage.html'));
 });
 
-// Admin Page (Password Protected via Frontend)
+// Admin Page
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin.html'));
-});
+});// ----------------- API ENDPOINTS -----------------
 
-
-// ----------------- API ENDPOINTS -----------------
-
-// 1. Generate Key API (Supports Hours / Days selection)
+// 1. Bulk Key Generator API (10, 20, 30, 50, 60 Keys at once)
 app.post('/api/generate-key', (req, res) => {
-  const { duration } = req.body; // duration hours mein aayega (jaise 1, 24, 720)
+  const { duration, count } = req.body;
   const hours = duration || 24;
+  const totalKeys = count || 1;
 
-  const randomPart = () => Math.random().toString(36).substring(2, 6).toUpperCase();
-  const newKey = `DRKE-${randomPart()}-${randomPart()}-${randomPart()}`;
+  const keysArray = [];
+  const createdAt = new Date().toISOString();
   
-  // Exact expiry calculation based on hours/days
   const expiryDate = new Date();
   expiryDate.setTime(expiryDate.getTime() + (hours * 60 * 60 * 1000));
   const expiresAt = expiryDate.toISOString();
-  const createdAt = new Date().toISOString();
 
-  db.run(`INSERT INTO keys (key_string, expires_at, created_at) VALUES (?, ?, ?)`, 
-    [newKey, expiresAt, createdAt], function(err) {
-    if (err) {
-      return res.status(500).json({ success: false, message: "Error generating key" });
-    }
-    res.json({ success: true, key: newKey, expires_at: expiresAt });
-  });
+  let completed = 0;
+
+  for (let i = 0; i < totalKeys; i++) {
+    const randomPart = () => Math.random().toString(36).substring(2, 6).toUpperCase();
+    const newKey = `DRKE-${randomPart()}-${randomPart()}-${randomPart()}`;
+    keysArray.push(newKey);
+
+    db.run(`INSERT INTO keys (key_string, expires_at, created_at) VALUES (?, ?, ?)`, 
+      [newKey, expiresAt, createdAt], function(err) {
+        completed++;
+        if (completed === totalKeys) {
+          if (err && keysArray.length === 1) {
+            return res.status(500).json({ success: false, message: "Error generating key" });
+          }
+          res.json({ success: true, keys: keysArray, expires_at: expiresAt });
+        }
+    });
+  }
 });
 
-// 2. Verify Key API (For Login with Expiry Validation)
+// 2. Verify Key API (For Login Expiry Check)
 app.post('/api/verify-key', (req, res) => {
   const { key } = req.body;
   db.get(`SELECT * FROM keys WHERE key_string = ?`, [key], (err, row) => {
@@ -88,7 +95,7 @@ app.post('/api/verify-key', (req, res) => {
       return res.json({ success: false, message: "Invalid key!" });
     }
 
-    // Check if key has expired
+    // Check expiry
     const now = new Date();
     const expiryTime = new Date(row.expires_at);
 
@@ -100,7 +107,7 @@ app.post('/api/verify-key', (req, res) => {
   });
 });
 
-// 3. Session Info API (For Home Page details)
+// 3. Session Info API (For Home Page & App Link)
 app.post('/api/session-info', (req, res) => {
   const { key } = req.body;
   
